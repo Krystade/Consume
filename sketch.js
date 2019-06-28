@@ -1,6 +1,12 @@
 let foods = [];
+let mobs = [];
 
 function setup() {
+	time = 0;
+	score = 0;
+	highScore = 0;
+	frameRate(60);
+	
 	width = windowWidth;
 	height = windowHeight;
 	createCanvas(width, height);
@@ -12,10 +18,17 @@ function setup() {
 	for(let i = 0; i < 10; i++){
 		foods.push(new Food());
 	}
+	for (let i = 0; i < 0; i++){
+		mobs.push(new Mob());
+		mobs[i].pos = createVector(random(0,width), random(0,height));
+	}
 }
 
 function draw() {
-	background(50,105,200);
+	if (frameCount % 60 == 0){
+		time++;
+	}
+	background(80,135,230);
 	for(let i = 0; i < foods.length; i++){
 		foods[i].display();
 		if(mob.canEat(foods[i]) & mob.health < mob.maxHealth){
@@ -23,10 +36,41 @@ function draw() {
 			foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
 			i--;
 			mob.health += 3.5;
+			score++;
+			if (score > highScore){
+				highScore = score;
+			}
 		}
+		for(let j = 0; j < mobs.length; j++){
+			if(mobs[j].canEat(foods[i]) & mobs[j].health < mobs[j].maxHealth){
+			//foods.splice(i,1);
+			foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
+			i--;
+			mobs[j].health += 3.5;
+			score++;
+			if (score > highScore){
+				highScore = score;
+			}
+		}
+		}
+	}
+	for(let i = 0; i < mobs.length; i++){
+		mobs[i].display();
+		mobs[i].move();
 	}
 	mob.display();
 	mob.move();
+	
+	push()
+	textSize(30);
+	textAlign(RIGHT);
+	text("Time: " + time, 140, 60);
+	text("Score: " + score, 140, 90)
+	textAlign(LEFT);
+	textSize(20);
+	fill("GOLD");
+	text("High Score: " + highScore, 20, height - 20)
+	pop();
 }
 //////
 class Entity{
@@ -79,6 +123,9 @@ class Mob extends Entity {
 			textSize(60);
 			textAlign(CENTER);
 			text("Game Over", width/2, height/2)
+			textSize(45);
+			fill(200,130,170);
+			text("Press Enter to restart", width/2 + 30, height/2 + 50);
 			pop();
 		}
 		//Points in the direction the mob is facing
@@ -110,16 +157,16 @@ class Mob extends Entity {
 	//Decelerating Entity
 		//keyCode 83 is s 40 is down arrow
 		else if (keyIsDown(83) || keyIsDown(40)){
-			this.velocity.x -= this.defaultAcc * this.direction.x * 5;
-			this.velocity.y -= this.defaultAcc * this.direction.y * 5;
+			this.velocity.x -= this.defaultAcc * this.direction.x * 3;
+			this.velocity.y -= this.defaultAcc * this.direction.y * 3;
 		}
 	//Rotating Entity
-		//keyCode 65 is a 37 is up arrow
+		//keyCode 65 is a & 37 is left arrow
 		if (keyIsDown(65) || keyIsDown(37)) {
-			this.direction.rotate(-4);
-		//keyCode 68 is d 39 is up arrow
+			this.turn(-4);
+		//keyCode 68 is d & 39 is right arrow
 		}else if (keyIsDown(68) || keyIsDown(39)) {
-			this.direction.rotate(4);
+			this.turn(4);
 		}
 		
 	//Boundaries
@@ -153,6 +200,12 @@ class Mob extends Entity {
 		}else{}
 	}
 	
+	//Turn the mob a certain amount of degrees
+	//positive angle is clockwise negative is counter clockwise
+	turn(angle){
+		this.direction.rotate(angle);
+	}
+	
 	canEat(food){
 		if(dist(this.pos.x, this.pos.y, food.pos.x, food.pos.y) < (this.size/2 + food.size)){
 			print("can eat: " + food);
@@ -180,7 +233,13 @@ class Food extends Entity{
 		
 	}
 }
-
+function reset(){
+	mob.pos = createVector(width/2,height/2);
+	mob.health = 30;
+	mob.velocity = createVector(0,0);
+	time = 0;
+	score = 0;
+}
 function keyPressed() {
 	//keyCode 32 is space
 	if (keyCode == 32){
@@ -193,4 +252,9 @@ function keyPressed() {
 			  "\nDirection:\t(" + mob.direction.x + "," + mob.direction.y + ")");
 		
     }
+	//keyCode 13 is enter
+	if (keyCode == 13){
+		print("enter");
+		reset();
+	}
 }
