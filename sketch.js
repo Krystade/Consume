@@ -2,9 +2,7 @@ let foods = [];
 let mobs = [];
 
 function setup() {
-	time = 0;
-	score = 0;
-	highScore = 0;
+	reset();
 	frameRate(60);
 	
 	width = windowWidth;
@@ -25,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-	if (frameCount % 60 == 0){
+	if (frameCount % 60 == 0 & !gameLost){
 		time++;
 	}
 	background(80,135,230);
@@ -239,6 +237,7 @@ function reset(){
 	mob.velocity = createVector(0,0);
 	time = 0;
 	score = 0;
+	gameLost = false;
 }
 function keyPressed() {
 	//keyCode 32 is space
