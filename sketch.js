@@ -23,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-	if (frameCount % 60 == 0 & !gameLost){
+	if (frameCount % 60 == 0 & gameLost != true){
 		time++;
 	}
 	background(80,135,230);
