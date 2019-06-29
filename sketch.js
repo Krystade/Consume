@@ -20,6 +20,7 @@ function setup() {
 		mobs[i].pos = createVector(random(0,width), random(0,height));
 	}
 	reset();
+	highScore = score;
 }
 
 function draw() {
