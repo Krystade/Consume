@@ -117,6 +117,8 @@ class Mob extends Entity {
 			//If health drops to 0 lock mob in place
 			this.pos = createVector(0,0);
 			this.direction = createVector(0,-1);
+			gameLost = true;
+			
 			push();
 			strokeWeight(2);
 			stroke("Black");
