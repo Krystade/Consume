@@ -23,8 +23,10 @@ function setup() {
 }
 
 function draw() {
-	if (frameCount % 60 == 0 & gameLost != true){
-		time++;
+	if (frameCount % 60 == 0){
+		if (gameLost != true){
+			time++;	
+		}
 	}
 	background(80,135,230);
 	for(let i = 0; i < foods.length; i++){
