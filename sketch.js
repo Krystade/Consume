@@ -2,7 +2,6 @@ let foods = [];
 let mobs = [];
 
 function setup() {
-	reset();
 	frameRate(60);
 	
 	width = windowWidth;
@@ -20,6 +19,7 @@ function setup() {
 		mobs.push(new Mob());
 		mobs[i].pos = createVector(random(0,width), random(0,height));
 	}
+	reset();
 }
 
 function draw() {
