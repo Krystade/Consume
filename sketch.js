@@ -24,7 +24,7 @@ function setup() {
 
 function draw() {
 	if (frameCount % 60 == 0){
-		if (gameLost != true){
+		if (gameLost !== true){
 			time++;	
 		}
 	}
