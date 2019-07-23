@@ -10,7 +10,7 @@ function setup() {
 	createCanvas(width, height);
 	
 	angleMode(DEGREES);
-	let normalR = createVector(-1,0);
+	let normalR = createVector(-1, 0);
 	
 	mob = new Mob();
 	for(let i = 0; i < 10; i++){
@@ -20,28 +20,28 @@ function setup() {
 	mobs.push(mob);
 	for (let i = 0; i < 0; i++){
 		mobs.push(new Mob());
-		mobs[i].pos = createVector(random(0,width), random(0,height));
+		mobs[i].pos = createVector(random(0, width), random(0, height));
 	}
-	reset()
+	reset();
 	
 }
 
 function draw() {
 	if (frameCount % 60 == 0){
-		if (gameLost !== true){	
+		if (gameLost !== true){
 			time++;
 		}
 	}
-	background(80,135,230);
+	background(80, 135, 230);
 	for(let i = 0; i < foods.length; i++){
 		
 		foods[i].display();
 		
 		for(let j = 0; j < mobs.length; j++){
 			if(mobs[j].canEat(foods[i]) & mobs[j].health < mobs[j].maxHealth){
-				//foods.splice(i,1);
+				//foods.splice(i, 1);
 				foods[i].hpValue = 1/time * 70;
-				foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
+				foods[i].pos = createVector(random(30, width - 30), random(30, height - 30));
 				if (foods[i].hpValue <= 3){
 					mobs[j].health += foods[i].hpValue;
 					score++;
@@ -78,7 +78,7 @@ function draw() {
 //////
 class Entity{
 	constructor(){
-		this.pos = createVector(width/2,height/2);
+		this.pos = createVector(width/2, height/2);
 		this.size = 50;
 	}
 }
@@ -88,9 +88,9 @@ class Mob extends Entity {
 		//give position and size
 		super();
 		//Direction Mob is moving
-		this.direction = createVector(1,0);
+		this.direction = createVector(1, 0);
 		////Movement variable
-		this.velocity = createVector(0,0);
+		this.velocity = createVector(0, 0);
 		this.defaultAcc = .1;
 		this.speed = 0;
 		this.maxSpeed = 15;
@@ -117,8 +117,8 @@ class Mob extends Entity {
 			this.health -= .05;
 		}else{
 			//If health drops to 0 lock mob in place
-			this.pos = createVector(0,0);
-			this.direction = createVector(0,-1);
+			this.pos = createVector(0, 0);
+			this.direction = createVector(0, -1);
 			push();
 			strokeWeight(2);
 			stroke("Black");
@@ -127,7 +127,7 @@ class Mob extends Entity {
 			textAlign(CENTER);
 			text("Game Over", width/2, height/2)
 			textSize(45);
-			fill(200,130,170);
+			fill(200, 130, 170);
 			text("Press Enter to restart", width/2 + 30, height/2 + 50);
 			pop();
 			
@@ -221,13 +221,12 @@ class Mob extends Entity {
 	}
 }
 ///////
-class Food extends Entity{ 
+class Food extends Entity{
 	constructor(){
 		super();
 		this.size = 15;
-		this.pos = createVector(random(30,width - 30), random(30, height  - 30));
+		this.pos = createVector(random(30, width - 30), random(30, height  - 30));
 		this.hpValue = 5;
-		
 		this.number = 0;
 	}
 	
@@ -235,21 +234,27 @@ class Food extends Entity{
 		push();
 		strokeWeight(0);
 		fill(85, 255, 61);
-		//noFill();
 		ellipse(this.pos.x, this.pos.y, this.size);
+		/*
 		stroke(1);
 		textAlign(CENTER);
 		textSize(25);
 		fill("Black");
 		text(this.number, this.pos.x, this.pos.y);
+		*/
 		pop();
 		
 	}
 }
 function reset(){
-	mob.pos = createVector(width/2,height/2);
+	for(let i = 0; i < mobs.length; i++){
+		mobs[i].pos = createVector(random(0, width), random(0, height));
+		mobs[i].health = 30;
+		mobs[i].velocity = createVector(0, 0);
+	}
+	mob.pos = createVector(width/2, height/2);
 	mob.health = 30;
-	mob.velocity = createVector(0,0);
+	mob.velocity = createVector(0, 0);
 	time = 0;
 	score = 0;
 	gameLost = false;
@@ -263,7 +268,7 @@ function keyPressed() {
 			  "\nY Velocity:\t" + mob.velocity.y + 
 			  "\nSpeed:\t" + floor(mob.speed) + 
 			  "\nAngle:\t" + mob.direction.heading() + 
-			  "\nDirection:\t(" + mob.direction.x + "," + mob.direction.y + ")");
+			  "\nDirection:\t(" + mob.direction.x + ", " + mob.direction.y + ")");
 		
     }
 	//keyCode 13 is enter
