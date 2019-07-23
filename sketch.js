@@ -18,7 +18,7 @@ function setup() {
 		foods[i].number = i + 1;
 	}
 	mobs.push(mob);
-	for (let i = 0; i < 0; i++){
+	for (let i = 0; i < 5; i++){
 		mobs.push(new Mob());
 		mobs[i].pos = createVector(random(0, width), random(0, height));
 	}
@@ -55,7 +55,6 @@ function draw() {
 						highScore = score;
 					}
 				}
-				i--;
 			}
 		}
 	}
