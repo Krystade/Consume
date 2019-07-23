@@ -2,6 +2,9 @@ let foods = [];
 let mobs = [];
 
 function setup() {
+	time = 0;
+	score = 0;
+	highScore = 0;
 	frameRate(60);
 	
 	width = windowWidth;
@@ -14,53 +17,50 @@ function setup() {
 	mob = new Mob();
 	for(let i = 0; i < 10; i++){
 		foods.push(new Food());
+		foods[i].number = i + 1;
 	}
+	mobs.push(mob);
 	for (let i = 0; i < 0; i++){
 		mobs.push(new Mob());
 		mobs[i].pos = createVector(random(0,width), random(0,height));
 	}
-	reset();
-	highScore = score;
 }
 
 function draw() {
 	if (frameCount % 60 == 0){
-		if (gameLost !== true){
-			time++;	
-		}
+		time++;
 	}
 	background(80,135,230);
 	for(let i = 0; i < foods.length; i++){
+		
 		foods[i].display();
-		if(mob.canEat(foods[i]) & mob.health < mob.maxHealth){
-			//foods.splice(i,1);
-			foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
-			i--;
-			mob.health += 3.5;
-			score++;
-			if (score > highScore){
-				highScore = score;
-			}
-		}
+		
 		for(let j = 0; j < mobs.length; j++){
 			if(mobs[j].canEat(foods[i]) & mobs[j].health < mobs[j].maxHealth){
-			//foods.splice(i,1);
-			foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
-			i--;
-			mobs[j].health += 3.5;
-			score++;
-			if (score > highScore){
-				highScore = score;
+				//foods.splice(i,1);
+				foods[i].hpValue = 1/time * 70;
+				foods[i].pos = createVector(random(30,width - 30), random(30,height - 30));
+				if (foods[i].hpValue <= 3){
+					mobs[j].health += foods[i].hpValue;
+					score++;
+					if (score > highScore){
+						highScore = score;
+					}
+				}else{
+					mobs[j].health += 3;
+					score++;
+					if (score > highScore){
+						highScore = score;
+					}
+				}
+				i--;
 			}
-		}
 		}
 	}
 	for(let i = 0; i < mobs.length; i++){
 		mobs[i].display();
 		mobs[i].move();
 	}
-	mob.display();
-	mob.move();
 	
 	push()
 	textSize(30);
@@ -117,8 +117,6 @@ class Mob extends Entity {
 			//If health drops to 0 lock mob in place
 			this.pos = createVector(0,0);
 			this.direction = createVector(0,-1);
-			gameLost = true;
-			
 			push();
 			strokeWeight(2);
 			stroke("Black");
@@ -224,6 +222,9 @@ class Food extends Entity{
 		super();
 		this.size = 15;
 		this.pos = createVector(random(30,width - 30), random(30, height  - 30));
+		this.hpValue = 5;
+		
+		this.number = 0;
 	}
 	
 	display(){
@@ -232,6 +233,11 @@ class Food extends Entity{
 		fill(85, 255, 61);
 		//noFill();
 		ellipse(this.pos.x, this.pos.y, this.size);
+		stroke(1);
+		textAlign(CENTER);
+		textSize(25);
+		fill("Black");
+		text(this.number, this.pos.x, this.pos.y);
 		pop();
 		
 	}
@@ -242,7 +248,6 @@ function reset(){
 	mob.velocity = createVector(0,0);
 	time = 0;
 	score = 0;
-	gameLost = false;
 }
 function keyPressed() {
 	//keyCode 32 is space
