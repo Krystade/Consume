@@ -2,8 +2,6 @@ let foods = [];
 let mobs = [];
 
 function setup() {
-	time = 0;
-	score = 0;
 	highScore = 0;
 	frameRate(60);
 	
@@ -24,11 +22,15 @@ function setup() {
 		mobs.push(new Mob());
 		mobs[i].pos = createVector(random(0,width), random(0,height));
 	}
+	reset()
+	
 }
 
 function draw() {
 	if (frameCount % 60 == 0){
-		time++;
+		if (gameLost !== true){	
+			time++;
+		}
 	}
 	background(80,135,230);
 	for(let i = 0; i < foods.length; i++){
@@ -128,6 +130,8 @@ class Mob extends Entity {
 			fill(200,130,170);
 			text("Press Enter to restart", width/2 + 30, height/2 + 50);
 			pop();
+			
+			gameLost = true;
 		}
 		//Points in the direction the mob is facing
 		strokeWeight(3);
@@ -248,6 +252,7 @@ function reset(){
 	mob.velocity = createVector(0,0);
 	time = 0;
 	score = 0;
+	gameLost = false;
 }
 function keyPressed() {
 	//keyCode 32 is space
