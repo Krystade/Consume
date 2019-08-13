@@ -2,6 +2,9 @@ let foods = [];
 let mobs = [];
 
 function setup() {
+	AI = false;
+	//AI = true;
+	turnSpeed = 4
 	highScore = 0;
 	frameRate(60);
 	
@@ -18,7 +21,7 @@ function setup() {
 		foods[i].number = i + 1;
 	}
 	mobs.push(mob);
-	for (let i = 0; i < 5; i++){
+	for (let i = 0; i < 0; i++){
 		mobs.push(new Mob());
 		mobs[i].pos = createVector(random(0, width), random(0, height));
 	}
@@ -59,15 +62,37 @@ function draw() {
 		}
 	}
 	for(let i = 0; i < mobs.length; i++){
+		shortest = foods[0];
+		distance = 100000;
+		for(let j = 0; j < foods.length; j++){
+			if(dist(mobs[i].pos.x, mobs[i].pos.y, foods[j].pos.x, foods[j].pos.y) < distance){
+				distance = dist(mobs[i].pos.x, mobs[i].pos.y, foods[j].pos.x, foods[j].pos.y);
+				shortest = foods[j];
+			}
+		}
+		push();
+		stroke('rgba(200,30,30,.45)');
+		//Draw a line to the closest piece of food
+		line(mobs[i].pos.x, mobs[i].pos.y, shortest.pos.x, shortest.pos.y);
+		pop();
+		//Create a vector for the distance between the mob i and the closest food
+		shortestVec = createVector((shortest.pos.x - mobs[i].pos.x), (shortest.pos.y - mobs[i].pos.y));
+		//normalize the vector so the magnitude equals 1
+		shortestVec.normalize();
+		//calculate the angle between shortestVec and 
+		mobs[i].angle = acos(mobs[i].direction.dot(shortestVec));
+		
+		
 		mobs[i].display();
 		mobs[i].move();
 	}
 	
-	push()
+	push();
+	strokeWeight(1);
 	textSize(30);
 	textAlign(RIGHT);
 	text("Time: " + time, 140, 60);
-	text("Score: " + score, 140, 90)
+	text("Score: " + score, 140, 90);
 	textAlign(LEFT);
 	textSize(20);
 	fill("GOLD");
@@ -88,6 +113,10 @@ class Mob extends Entity {
 		super();
 		//Direction Mob is moving
 		this.direction = createVector(1, 0);
+		//Direction vector rotated 25 degrees clockwise
+		this.cw = this.direction.copy().rotate(25);
+		//Direction vector rotated 25 degrees counter clockwise
+		this.ccw = this.direction.copy().rotate(-25);
 		////Movement variable
 		this.velocity = createVector(0, 0);
 		this.defaultAcc = .1;
@@ -96,6 +125,8 @@ class Mob extends Entity {
 		
 		this.health = 30;
 		this.maxHealth = 100;
+		
+		this.angle = 0;
 	}
 	
 	display(){
@@ -124,7 +155,7 @@ class Mob extends Entity {
 			fill("Red");
 			textSize(60);
 			textAlign(CENTER);
-			text("Game Over", width/2, height/2)
+			text("Game Over", width/2, height/2);
 			textSize(45);
 			fill(200, 130, 170);
 			text("Press Enter to restart", width/2 + 30, height/2 + 50);
@@ -132,9 +163,19 @@ class Mob extends Entity {
 			
 			gameLost = true;
 		}
+		push();
 		//Points in the direction the mob is facing
 		strokeWeight(3);
 		line(this.pos.x, this.pos.y, this.pos.x + this.direction.x*50, this.pos.y + this.direction.y*50);
+		if(AI){
+			//points 25 degrees clockwise
+			stroke(35, 80, 200, 300); //RED
+			line(this.pos.x, this.pos.y, this.pos.x + this.cw.x*35, this.pos.y + this.cw.y*35);
+			//points 25 degrees counter clockwise
+			stroke(156, 25, 25,300); //BLUE
+			line(this.pos.x, this.pos.y, this.pos.x + this.ccw.x*35, this.pos.y + this.ccw.y*35);
+		}
+		pop();
 	}
 	
 	move(){
@@ -155,7 +196,7 @@ class Mob extends Entity {
 				this.velocity.x += this.defaultAcc * this.direction.x;
 				this.velocity.y += this.defaultAcc * this.direction.y;
 			}else{
-				print("Maximum Speed Achieved")
+				print("Maximum Speed Achieved");
 			}
 		}
 	//Decelerating Entity
@@ -167,11 +208,27 @@ class Mob extends Entity {
 	//Rotating Entity
 		//keyCode 65 is a & 37 is left arrow
 		if (keyIsDown(65) || keyIsDown(37)) {
-			this.turn(-4);
+			this.turn(-turnSpeed);
 		//keyCode 68 is d & 39 is right arrow
 		}else if (keyIsDown(68) || keyIsDown(39)) {
-			this.turn(4);
+			this.turn(turnSpeed);
+		}else if (AI){
+			if (this.angle > 10) {
+				//Checking the distance between the clsoest food and the two lines on either side of the direction
+				if (dist(this.pos.x + this.cw.x, this.pos.y + this.cw.y, shortest.pos.x, shortest.pos.y) < dist(this.pos.x + this.ccw.x, this.pos.y + this.ccw.y, shortest.pos.x, shortest.pos.y)) {
+					//If turning Clockwise will be faster
+					this.turn(turnSpeed);
+				}else {
+					//If turning Counter Clockwise will be faster
+					this.turn(-turnSpeed);
+				}
+			}
 		}
+		
+		//Direction vector rotated 25 degrees clockwise
+		this.cw = this.direction.copy().rotate(25);
+		//Direction vector rotated 25 degrees counter clockwise
+		this.ccw = this.direction.copy().rotate(-25);
 		
 	//Boundaries
 		//X direction
@@ -212,14 +269,14 @@ class Mob extends Entity {
 	
 	canEat(food){
 		if(dist(this.pos.x, this.pos.y, food.pos.x, food.pos.y) < (this.size/2 + food.size)){
-			print("can eat: " + food);
+			//print("can eat: " + food);
 			return true;
 		}else{
 			return false;
 		}
 	}
 }
-///////
+
 class Food extends Entity{
 	constructor(){
 		super();
@@ -234,7 +291,8 @@ class Food extends Entity{
 		strokeWeight(0);
 		fill(85, 255, 61);
 		ellipse(this.pos.x, this.pos.y, this.size);
-		/*
+		
+		/* DISPLAY NUMBER OF FOOD IN ARRAY ABOVE FOOD
 		stroke(1);
 		textAlign(CENTER);
 		textSize(25);
